@@ -1,0 +1,252 @@
+{
+  "_nota": "Senarai produk untuk borang pesanan BCL NBK Express. BUKAN format import rasmi BCL - rujukan untuk isi borang secara manual atau dihantar kepada sokongan BCL. Harga lauk KNB ikut laporan LIST KNB; harga lain ialah nilai demo - sahkan sebelum guna.",
+  "jumlah_produk": 41,
+  "produk": [
+    {
+      "vendor": "AIR DINGIN",
+      "lajur": "IKAN",
+      "nama_produk_bcl": "IKAN GULAI (AIR DINGIN)",
+      "harga": "3.30"
+    },
+    {
+      "vendor": "AIR DINGIN",
+      "lajur": "IKAN PDS",
+      "nama_produk_bcl": "IKAN PEDAS (AIR DINGIN)",
+      "harga": "3.30"
+    },
+    {
+      "vendor": "AIR DINGIN",
+      "lajur": "A. GUL",
+      "nama_produk_bcl": "AYAM GULAI (AIR DINGIN)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "AIR DINGIN",
+      "lajur": "A. GOR",
+      "nama_produk_bcl": "AYAM GORENG (AIR DINGIN)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "AIR DINGIN",
+      "lajur": "A. KICAP",
+      "nama_produk_bcl": "AYAM KICAP (AIR DINGIN)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "AIR DINGIN",
+      "lajur": "DGG KER",
+      "nama_produk_bcl": "DAGING KERUTUK (AIR DINGIN)",
+      "harga": "4.00"
+    },
+    {
+      "vendor": "AIR DINGIN",
+      "lajur": "N.D. IKAN",
+      "nama_produk_bcl": "NASI DAGANG IKAN (AIR DINGIN)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "AIR DINGIN",
+      "lajur": "N.K. AYAM",
+      "nama_produk_bcl": "NASI KERABU AYAM GORENG (AIR DINGIN)",
+      "harga": "4.50"
+    },
+    {
+      "vendor": "CHE YAM",
+      "lajur": "N.A. GUL",
+      "nama_produk_bcl": "NASI AYAM GULAI (CHE YAM)",
+      "harga": "4.50"
+    },
+    {
+      "vendor": "CHE YAM",
+      "lajur": "N.A. GOR",
+      "nama_produk_bcl": "NASI AYAM GORENG (CHE YAM)",
+      "harga": "4.50"
+    },
+    {
+      "vendor": "CHE YAM",
+      "lajur": "DGG GUL",
+      "nama_produk_bcl": "DAGING GULAI (CHE YAM)",
+      "harga": "4.00"
+    },
+    {
+      "vendor": "CHE YAM",
+      "lajur": "DGG KER",
+      "nama_produk_bcl": "DAGING KERUTUK (CHE YAM)",
+      "harga": "4.00"
+    },
+    {
+      "vendor": "CHE YAM",
+      "lajur": "N.D. IKAN",
+      "nama_produk_bcl": "NASI DAGANG IKAN (CHE YAM)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "CHE YAM",
+      "lajur": "N.D. AYAM",
+      "nama_produk_bcl": "NASI DAGANG AYAM (CHE YAM)",
+      "harga": "3.70"
+    },
+    {
+      "vendor": "FIZOW KITCHEN",
+      "lajur": "NB A. GUL",
+      "nama_produk_bcl": "NASI BERLAUK AYAM GULAI (FIZOW KITCHEN)",
+      "harga": "5.50"
+    },
+    {
+      "vendor": "FIZOW KITCHEN",
+      "lajur": "NB A. PDS",
+      "nama_produk_bcl": "NASI BERLAUK AYAM PEDAS (FIZOW KITCHEN)",
+      "harga": "5.50"
+    },
+    {
+      "vendor": "FIZOW KITCHEN",
+      "lajur": "NB A. KER",
+      "nama_produk_bcl": "NASI BERLAUK AYAM KERUTUK (FIZOW KITCHEN)",
+      "harga": "5.50"
+    },
+    {
+      "vendor": "FIZOW KITCHEN",
+      "lajur": "NB DGG",
+      "nama_produk_bcl": "NASI BERLAUK DAGING BERLENGAS (FIZOW KITCHEN)",
+      "harga": "6.00"
+    },
+    {
+      "vendor": "KAKCHIK",
+      "lajur": "IKAN",
+      "nama_produk_bcl": "IKAN GULAI (KAKCHIK)",
+      "harga": "3.30"
+    },
+    {
+      "vendor": "KAKCHIK",
+      "lajur": "A. GUL",
+      "nama_produk_bcl": "AYAM GULAI (KAKCHIK)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "KAKCHIK",
+      "lajur": "A. GOR",
+      "nama_produk_bcl": "AYAM GORENG (KAKCHIK)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "KAKCHIK",
+      "lajur": "A. PDS",
+      "nama_produk_bcl": "AYAM PEDAS (KAKCHIK)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "KAKCHIK",
+      "lajur": "DGG GOR",
+      "nama_produk_bcl": "DAGING GORENG (KAKCHIK)",
+      "harga": "4.00"
+    },
+    {
+      "vendor": "KAKCHIK",
+      "lajur": "DGG KER",
+      "nama_produk_bcl": "DAGING KERUTUK (KAKCHIK)",
+      "harga": "4.00"
+    },
+    {
+      "vendor": "KAKCHIK",
+      "lajur": "N.D. IKAN",
+      "nama_produk_bcl": "NASI DAGANG IKAN (KAKCHIK)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "KAKCHIK",
+      "lajur": "N.D. AYAM",
+      "nama_produk_bcl": "NASI DAGANG AYAM (KAKCHIK)",
+      "harga": "3.70"
+    },
+    {
+      "vendor": "KNB",
+      "lajur": "IKAN",
+      "nama_produk_bcl": "IKAN GULAI (KNB)",
+      "harga": "3.30"
+    },
+    {
+      "vendor": "KNB",
+      "lajur": "A. GUL",
+      "nama_produk_bcl": "AYAM GULAI (KNB)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "KNB",
+      "lajur": "A. GOR",
+      "nama_produk_bcl": "AYAM GORENG (KNB)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "KNB",
+      "lajur": "A. PDS",
+      "nama_produk_bcl": "AYAM PEDAS (KNB)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "KNB",
+      "lajur": "DGG GOR",
+      "nama_produk_bcl": "DAGING GORENG (KNB)",
+      "harga": "4.00"
+    },
+    {
+      "vendor": "KNB",
+      "lajur": "DGG KER",
+      "nama_produk_bcl": "DAGING KERUTUK (KNB)",
+      "harga": "4.00"
+    },
+    {
+      "vendor": "KNB",
+      "lajur": "N.D. IKAN",
+      "nama_produk_bcl": "NASI DAGANG IKAN (KNB)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "KNB",
+      "lajur": "N.D. AYAM",
+      "nama_produk_bcl": "NASI DAGANG AYAM (KNB)",
+      "harga": "3.70"
+    },
+    {
+      "vendor": "KNB",
+      "lajur": "N.D. DGG",
+      "nama_produk_bcl": "NASI DAGANG DAGING (KNB)",
+      "harga": "3.70"
+    },
+    {
+      "vendor": "TENGKU NOOR",
+      "lajur": "IKAN",
+      "nama_produk_bcl": "IKAN GULAI (TNB)",
+      "harga": "3.30"
+    },
+    {
+      "vendor": "TENGKU NOOR",
+      "lajur": "A. GUL",
+      "nama_produk_bcl": "AYAM GULAI (TNB)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "TENGKU NOOR",
+      "lajur": "A. PDS",
+      "nama_produk_bcl": "AYAM PEDAS (TNB)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "TENGKU NOOR",
+      "lajur": "A. GOR",
+      "nama_produk_bcl": "AYAM GORENG (TNB)",
+      "harga": "3.60"
+    },
+    {
+      "vendor": "TENGKU NOOR",
+      "lajur": "DGG GOR",
+      "nama_produk_bcl": "DAGING GORENG (TNB)",
+      "harga": "4.00"
+    },
+    {
+      "vendor": "TENGKU NOOR",
+      "lajur": "DGG KER",
+      "nama_produk_bcl": "DAGING KERUTUK (TNB)",
+      "harga": "4.00"
+    }
+  ]
+}

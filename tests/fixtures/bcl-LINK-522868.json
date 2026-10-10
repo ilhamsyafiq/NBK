@@ -1,0 +1,37 @@
+{
+  "_nota": "Transaksi sebenar dari BCL (get_transaction_by_order, borang 18624) dibungkus sebagai webhook payment-success. Butiran pembayar disamarkan.",
+  "event": "payment-success",
+  "data": {
+    "formable_type": "Payment Form",
+    "formable_id": 18624,
+    "form_title": "NBK Express - Borang Pesanan Ejen",
+    "record_type": "Transaction",
+    "record_id": "LINK-522868",
+    "main_data": {
+      "id": "01demo0000000000000transx",
+      "payer_name": "EJEN UJIAN",
+      "payer_email": "ejen@contoh.test",
+      "payer_telephone_number": "+60190000000",
+      "order_number": "LINK-522868",
+      "transaction_type": "live",
+      "currency": "MYR",
+      "subtotal_amount": 57.6,
+      "discount_amount": 57.6,
+      "coupon_code": "test",
+      "fee_amount": 0,
+      "amount": 0,
+      "payment_channel": "Manual Payment",
+      "status": 3,
+      "status_description": "Successful",
+      "is_paid": true,
+      "created_at": "2026-10-10 16:03:04",
+      "items": [
+        { "id": 522842, "item": "KNB", "sku": "MENU-002", "option": "AYAM GULAI (KNB)", "quantity": 6, "unit_amount": "3.60", "amount": "21.60" },
+        { "id": 522843, "item": "KNB", "sku": "MENU-003", "option": "AYAM GORENG (KNB)", "quantity": 4, "unit_amount": "3.60", "amount": "14.40" },
+        { "id": 522844, "item": "KAKCHIK", "sku": "MENU-013", "option": "AYAM PEDAS (KAKCHIK)", "quantity": 3, "unit_amount": "3.60", "amount": "10.80" },
+        { "id": 522845, "item": "AIR DINGIN", "sku": "MENU-020", "option": "AYAM GULAI (AIR DINGIN)", "quantity": 3, "unit_amount": "3.60", "amount": "10.80" }
+      ]
+    },
+    "receipt_url": "https://example.com/resit/LINK-522868.pdf"
+  }
+}

@@ -1,0 +1,8 @@
+# Dev webhook inbox: secret key + real webhook payloads (personal data) — never commit
+api/data/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
