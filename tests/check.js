@@ -105,6 +105,22 @@ assert.strictEqual(S.payStatus(W.process(short).order), 'mismatch');
   assert.strictEqual(o.payment.receiptUrl, 'https://example.com/resit/LINK-522868.pdf');
 }
 
+// Order window 10:00–15:00: late orders are held until the admin decides
+{
+  assert.strictEqual(u.fmtHM('15:00'), '3:00 PTG'); assert.strictEqual(u.fmtHM('10:05'), '10:05 PG');
+  const allLate = S.lateOrders(today), late = allLate.filter((o) => ['15:20', '16:05'].includes(u.hmOf(o.submittedAt)));
+  assert.strictEqual(late.length, 2, 'two seeded late orders (15:20, 16:05)');
+  assert.ok(late.every((o) => !S.dayOrders(today).includes(o)), 'late orders not counted');
+  assert.ok(late.every(S.needsReview));
+  const before = S.vendorSheet(today, kak.id).totalQty, tomorrow = u.addDays(today, 1);
+  late[0].lateDecision = 'include';
+  assert.strictEqual(S.vendorSheet(today, kak.id).totalQty, before + S.orderQty(late[0]));
+  late[1].lateDecision = 'next';
+  assert.ok(S.dayOrders(tomorrow).includes(late[1]) && !S.dayOrders(today).includes(late[1]));
+  assert.strictEqual(S.lateOrders(today).length, allLate.length - 2);
+  assert.strictEqual(S.dayWindow(u.addDays(today, -1)).closed, true);
+}
+
 // Sent marker detects later changes
 S.markSent(today, kak.id);
 assert.strictEqual(S.sentStatus(today, kak.id).changed, false);

@@ -27,6 +27,7 @@ Sistem untuk admin dan staf NBK Express (Nasi Berlauk Kelantan): kumpul pesanan 
 - Ejen mengisi Nama, Emel dan No. HP sendiri dalam borang. Ejen dipadankan **ikut No. HP dahulu** (format +60 / 0 / sengkang tidak penting), kemudian nama. Nama yang ditaip berbeza dipaparkan sebagai "ditaip: ...".
 - No. HP yang belum ada dalam senarai ejen tetap dikira (ditanda "baru") dan dipaparkan di "Perlu tindakan".
 - **Hanya pesanan yang sudah dibayar dikira**: event `payment-success` sahaja; `form-submit` / `payment-failed` diabaikan. Pesanan dibatalkan oleh admin tidak dikira.
+- **Waktu pesanan** (brief: borang dibuka 10:00 PG – 3:00 PTG, senarai dikunci 3:00 PTG; boleh ubah di Tetapan → Waktu pesanan). Pesanan yang dibayar di luar waktu ditanda **Lewat**, tidak dikira, dan dipaparkan di "Perlu tindakan" — admin pilih *Masukkan hari ini* atau *Pindah ke esok*.
 - Satu pesanan boleh mengandungi item dari beberapa vendor (satu borang); sistem pecahkan item ke senarai setiap vendor.
 - Kawasan (KL/Kelantan) datang daripada rekod ejen, jadi satu borang untuk semua kawasan sudah memadai.
 - No. pesanan BCL ialah identiti pesanan; event yang sama dihantar dua kali tidak dikira dua kali.
@@ -56,7 +57,7 @@ Prototaip statik tidak boleh menerima webhook. Untuk menguji format sebenar:
 - Kunci API disimpan terenkripsi di skrin tetapan admin, bukan dalam kod. Log audit di pelayan.
 
 ## Perlu disahkan oleh NBK
-1. Waktu tutup pesanan harian (cut-off) — belum dibincangkan; sekarang pesanan ikut tarikh bayaran.
+1. ~~Waktu tutup~~ — 10:00 PG–3:00 PTG (brief NBK-Order-Flow). Belum: tarikh hantar = esok (+1 hari) dan hari tanpa hantaran.
 2. ~~Nama medan payload BCL~~ — **disahkan** dengan transaksi sebenar LINK-522868 (borang BCL 18624): `payer_name` / `payer_email` / `payer_telephone_number`, item = kumpulan vendor, `option` = menu, `sku` = MENU-xxx, `discount_amount` + `coupon_code`, `receipt_url`. Pengesahan bayaran boleh dibuat melalui API BCL (`get_transaction` ikut no. pesanan) — tiada integrasi BayarCash berasingan diperlukan.
 3. "TNB" dalam borang = TENGKU NOOR? KNB tiada dalam borang OnPay contoh — apakah nama item KNB dalam borang BCL?
 4. Menu dan harga bagi vendor lain (DEPEY TANGGO, KAKAK AISYAH, dll.).

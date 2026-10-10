@@ -3,7 +3,7 @@
 (function (NBK) {
   'use strict';
   const u = NBK.u;
-  const KEY = 'nbk-express-demo-v8';
+  const KEY = 'nbk-express-demo-v9';
   const S = { state: null };
   const hasLS = () => { try { return typeof localStorage !== 'undefined'; } catch (e) { return false; } };
 
@@ -53,10 +53,23 @@
     if (!p || !p.verifiedAt) return 'pending';
     return p.amountSen === expectedSen(o) || p.accepted ? 'ok' : 'mismatch';
   }
-  const needsReview = (o) => !o.cancelled && (o.items.some((i) => !resolveMenu(i)) || payStatus(o) !== 'ok');
+  // Order window (brief: form open 10:00–15:00, lists locked at 15:00). Orders paid outside it are "late":
+  // not counted until the admin chooses include-today or move-to-tomorrow (o.lateDecision).
+  const win = () => ({ open: st().settings.openTime || '10:00', cutoff: st().settings.cutoffTime || '15:00' });
+  const outsideWindow = (o) => { const hm = u.hmOf(o.submittedAt), w = win(); return hm < w.open || hm >= w.cutoff; };
+  const isLate = (o) => !o.cancelled && outsideWindow(o) && !o.lateDecision;
+  const batchDate = (o) => (o.lateDecision === 'next' ? u.addDays(o.date, 1) : o.date);
+  function dayWindow(date) {
+    const w = win(), today = u.todayMY(), now = u.hmOf(new Date().toISOString());
+    const closed = date < today || (date === today && now >= w.cutoff);
+    const [ch, cm] = w.cutoff.split(':').map(Number), [nh, nm] = now.split(':').map(Number);
+    return { ...w, closed, future: date > today, minsLeft: date === today && !closed ? ch * 60 + cm - (nh * 60 + nm) : null };
+  }
+  const lateOrders = (date) => st().orders.filter((o) => o.date === date && isLate(o));
+  const needsReview = (o) => !o.cancelled && (o.items.some((i) => !resolveMenu(i)) || payStatus(o) !== 'ok' || isLate(o));
 
   // Orders that count for a day's vendor lists (only paid orders ever get imported)
-  const dayOrders = (date) => st().orders.filter((o) => o.date === date && !o.cancelled);
+  const dayOrders = (date) => st().orders.filter((o) => batchDate(o) === date && !o.cancelled && !isLate(o));
 
   // Unknown item names for a date → [{name, qty, orders}]
   function unmapped(date) {
@@ -141,5 +154,5 @@
     log('Rekonsiliasi selesai', `${u.fmtDate(date)} · ${r.txCount} transaksi · ${u.rm(r.txSen)}${r.issues.length ? ` · ${r.issues.length} isu diterima: ${note}` : ''}`);
   }
 
-  NBK.store = { S, load, save, reset, st, log, vendor, menu, vendorMenus, agentOf, agentLabel, resolveMenu, orderQty, orderSen, expectedSen, payStatus, needsReview, dayOrders, unmapped, vendorSheet, sentStatus, markSent, unmarkSent, reconcile, reconStatus, markReconciled };
+  NBK.store = { S, load, save, reset, st, log, vendor, menu, vendorMenus, agentOf, agentLabel, resolveMenu, orderQty, orderSen, expectedSen, payStatus, needsReview, win, outsideWindow, isLate, batchDate, dayWindow, lateOrders, dayOrders, unmapped, vendorSheet, sentStatus, markSent, unmarkSent, reconcile, reconStatus, markReconciled };
 })(globalThis.NBK = globalThis.NBK || {});

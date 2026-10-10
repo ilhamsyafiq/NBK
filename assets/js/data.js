@@ -65,7 +65,7 @@
           vm.forEach((m) => { if (r() < (want > 1 ? 0.3 : 0.45)) items.push({ sku: m.sku, name: m.name, qty: pick(qtys), unitSen: m.price }); });
           if (items.length === before) items.push({ sku: vm[0].sku, name: vm[0].name, qty: 5, unitSen: vm[0].price });
         });
-        const hm = String(6 + Math.floor(r() * 5)).padStart(2, '0') + ':' + String(Math.floor(r() * 60)).padStart(2, '0');
+        const hm = String(10 + Math.floor(r() * 5)).padStart(2, '0') + ':' + String(Math.floor(r() * 60)).padStart(2, '0'); // form open 10:00–15:00
         const typed = r() < 0.7 ? a.name : r() < 0.5 ? a.name.toLowerCase() : a.name.split(/[ .]/)[0] + ' nbk';
         orders.push(mk('LINK-0' + seq++, date, hm, typed, a.phone, items));
       });
@@ -77,11 +77,16 @@
     // Today's review cases
     const ad = menus.find((m) => m.short === 'N.D. IKAN' && m.vendorId === vid('KNB'));
     const huda = agents.find((a) => a.name === 'HUDA');
-    orders.push(mk('LINK-0' + seq++, today, '09:05', 'Huda', huda.phone, [{ sku: '', name: 'NASI TUMPANG (PASIR HOR)', qty: 4, unitSen: 500 }, { sku: ad.sku, name: ad.name, qty: 5, unitSen: ad.price }]));
-    orders.push(mk('LINK-0' + seq++, today, '09:20', 'Kak Long', '019-0000 9999', [{ sku: ad.sku, name: ad.name, qty: 6, unitSen: ad.price }]));
-    const c = mk('LINK-0' + seq++, today, '07:58', 'AMBO', agents.find((a) => a.name === 'AMBO').phone, [{ sku: ad.sku, name: ad.name, qty: 10, unitSen: ad.price }]);
+    orders.push(mk('LINK-0' + seq++, today, '11:05', 'Huda', huda.phone, [{ sku: '', name: 'NASI TUMPANG (PASIR HOR)', qty: 4, unitSen: 500 }, { sku: ad.sku, name: ad.name, qty: 5, unitSen: ad.price }]));
+    orders.push(mk('LINK-0' + seq++, today, '11:20', 'Kak Long', '019-0000 9999', [{ sku: ad.sku, name: ad.name, qty: 6, unitSen: ad.price }]));
+    const c = mk('LINK-0' + seq++, today, '10:58', 'AMBO', agents.find((a) => a.name === 'AMBO').phone, [{ sku: ad.sku, name: ad.name, qty: 10, unitSen: ad.price }]);
     c.cancelled = true; c.note = 'Dibatalkan oleh admin (demo).';
     orders.push(c);
+    // Paid after the 3:00 PM cut-off → admin decides (include today / move to tomorrow)
+    [['15:20', 'ADNAN'], ['16:05', 'SITI']].forEach(([hm, name]) => {
+      const a = agents.find((x) => x.name === name);
+      orders.push(mk('LINK-0' + seq++, today, hm, name, a.phone, [{ sku: ad.sku, name: ad.name, qty: 5, unitSen: ad.price }]));
+    });
 
     function mk(id, date, hm, agentName, phone, items) {
       const at = new Date(u.isoMY(date, hm)).toISOString();
@@ -106,7 +111,7 @@
     const txOf = (o) => ({ txId: o.payment.txId, orderId: o.sourceOrderId, agentName: o.agentName, phone: o.agentPhone, amountSen: o.payment.amountSen, paidAt: o.payment.paidAt, date: o.date, payload: null });
     const txns = orders.map(txOf);
     // Reconciliation cases: a paid order whose webhook never arrived (today + yesterday), and a system order with no BCL transaction.
-    [[today, '10:41', 'MINIE'], [u.addDays(today, -1), '09:12', 'STESEN']].forEach(([date, hm, name]) => {
+    [[today, '12:41', 'MINIE'], [u.addDays(today, -1), '11:12', 'STESEN']].forEach(([date, hm, name]) => {
       const a = agents.find((x) => x.name === name), m = menus.filter((x) => x.vendorId === vid('KNB'));
       const missed = mk('LINK-0' + seq++, date, hm, name, a.phone, [{ sku: m[0].sku, name: m[0].name, qty: 10, unitSen: m[0].price }, { sku: m[1].sku, name: m[1].name, qty: 10, unitSen: m[1].price }]);
       events.pop(); // the webhook never reached us
@@ -121,7 +126,7 @@
 
     return {
       version: 2, seededFor: today, vendors, menus, agents, orders, events, sent: {}, txns, pulled: {}, recon: {},
-      settings: {},
+      settings: { openTime: '10:00', cutoffTime: '15:00' },
       logs: [{ at: new Date().toISOString(), action: 'Data demo dimuatkan', detail: `${orders.length} pesanan demo (7 hari).` }],
     };
   }

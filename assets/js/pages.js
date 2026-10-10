@@ -14,6 +14,10 @@
   const kpi = (ic, value, label, tone) => `<div class="kpi ${tone || ''}"><span class="kpi-ic">${ui.icon(ic)}</span><div><span class="kpi-l">${label}</span><b>${value}</b></div></div>`;
   const VC_TONES = [['#ecfdf5', '#047857'], ['#eff6ff', '#1d4ed8'], ['#f5f3ff', '#6d28d9'], ['#fff7ed', '#c2410c'], ['#fdf2f8', '#be185d'], ['#ecfeff', '#0e7490']];
   const initials = (n) => n.split(/\s+/).slice(0, 2).map((w) => w[0]).join('');
+  const winChip = (d) => { const w = S.dayWindow(d);
+    if (w.future) return chip('gray', `Dibuka ${u.fmtHM(w.open)} – ${u.fmtHM(w.cutoff)}`);
+    if (w.closed) return chip('ok', `Ditutup ${u.fmtHM(w.cutoff)} · senarai dikunci`);
+    return chip('warn', `Dibuka · tutup ${u.fmtHM(w.cutoff)} (${Math.floor(w.minsLeft / 60) ? Math.floor(w.minsLeft / 60) + 'j ' : ''}${w.minsLeft % 60}m lagi)`); };
   const payChip = (o) => ({ ok: chip('ok', '✓ Disahkan'), pending: chip('warn', 'Belum disahkan'), mismatch: chip('err', 'Amaun tak sepadan') })[S.payStatus(o)];
   const who = (o) => { const a = S.agentOf(o); return a ? esc(a.name) + (u.norm(o.agentName) !== a.name ? ` <span class="muted xs">(ditaip: ${esc(o.agentName)})</span>` : '') : `${esc(u.norm(o.agentName))} ${chip('warn', 'baru')}`; };
 
@@ -97,18 +101,20 @@
       const vs = vendorSummary(d), withQty = vs.filter((x) => x.sh.totalQty), none = vs.length - withQty.length;
       const pcs = os.reduce((s, o) => s + S.orderQty(o), 0), sen = os.reduce((s, o) => s + S.orderSen(o), 0);
       const agents = new Set(os.map(S.agentLabel)).size;
-      const payIssues = os.filter((o) => S.payStatus(o) !== 'ok'), verified = os.length - payIssues.length;
+      const payIssues = os.filter((o) => S.payStatus(o) !== 'ok'), verified = os.length - payIssues.length, late = S.lateOrders(d);
       return `
       <div class="hero">
-        <div><h2>${dateTitle(d)}</h2><p class="muted">Pesanan daripada BCL dikumpul ikut vendor. Klik vendor untuk lihat siapa order apa.</p></div>
+        <div><h2>${dateTitle(d)}</h2><p class="muted">Pesanan daripada BCL dikumpul ikut vendor. Klik vendor untuk lihat siapa order apa.</p><div class="mt">${winChip(d)}</div></div>
       </div>
       <div class="kpis">
         ${kpi('bag', os.length, 'Pesanan')}${kpi('users', agents, 'Ejen', 't-violet')}${kpi('box', u.num(pcs), 'Jumlah pcs', 't-blue')}
         ${kpi('wallet', u.rm(sen), 'Nilai')}${kpi('shield', `${verified}/${os.length}`, 'Bayaran disahkan', payIssues.length ? 't-amber' : 't-ok')}
       </div>
-      ${un.length || newAgents.length || payIssues.length ? `<section class="card attn"><h3>${ui.icon('alert')} Perlu tindakan</h3>
+      ${un.length || newAgents.length || payIssues.length || late.length ? `<section class="card attn"><h3>${ui.icon('alert')} Perlu tindakan</h3>
         ${un.map((x, i) => `<div class="todo"><div><b>${esc(x.name)}</b> — ${x.qty} pcs<br><span class="muted sm">Item ini tidak dikenali, jadi belum masuk mana-mana senarai vendor. Pilih menu yang betul.</span></div>
           <div class="todo-act"><select id="un-${i}" aria-label="Pilih menu untuk ${esc(x.name)}"><option value="">— Pilih menu —</option>${menuOptions()}</select><button class="btn btn-primary" data-act="mapItem" data-i="${i}" data-name="${esc(x.name)}">Simpan</button></div></div>`).join('')}
+        ${late.map((o) => `<div class="todo"><div><b>${esc(o.sourceOrderId)}</b> · ${esc(S.agentLabel(o))} ${chip('warn', 'Lewat')} — ${S.orderQty(o)} pcs<br><span class="muted sm">Dibayar ${u.fmtHM(u.hmOf(o.submittedAt))}, di luar waktu pesanan ${u.fmtHM(S.win().open)} – ${u.fmtHM(S.win().cutoff)}. Belum dikira dalam mana-mana senarai.</span></div>
+          <div class="todo-act"><button class="btn" data-act="lateDecide" data-id="${esc(o.id)}" data-v="include">Masukkan hari ini</button><button class="btn btn-primary" data-act="lateDecide" data-id="${esc(o.id)}" data-v="next">Pindah ke ${esc(u.dayName(u.addDays(d, 1)))}</button></div></div>`).join('')}
         ${newAgents.map((o) => `<div class="todo"><div><b>${esc(u.norm(o.agentName))}</b> · ${esc(o.agentPhone || 'tiada No. HP')}<br><span class="muted sm">No. HP ini belum ada dalam senarai ejen. Pesanan tetap dikira; tambah ejen supaya kawasan diketahui.</span></div>
           <div class="todo-act"><button class="btn" data-act="agentAdd" data-name="${esc(u.norm(o.agentName))}" data-phone="${esc(o.agentPhone || '')}">Tambah ejen</button></div></div>`).join('')}
         ${payIssues.map((o) => `<div class="todo"><div><b>${esc(o.sourceOrderId)}</b> · ${esc(S.agentLabel(o))} ${payChip(o)}<br><span class="muted sm">${S.payStatus(o) === 'mismatch'
@@ -137,7 +143,7 @@
     ui.commit(); ui.toast(`"${d.name}" kini dikira sebagai ${m.short} (${S.vendor(m.vendorId).name}).`);
   };
   A.demoOrder = () => {
-    const p = W.example(); p.data.main_data.created_at = u.fmtDate(V.date) + ' 09:30:00';
+    const p = W.example(); p.data.main_data.created_at = u.fmtDate(V.date) + ' 11:30:00';
     const r = W.process(p); ui.commit(); ui.toast(r.message, r.status === 'processed' ? 'ok' : 'err');
   };
 
@@ -167,6 +173,7 @@
       <article class="sheet">
         <div class="sheet-title">NBK EXPRESS ( NASI BERLAUK KELANTAN )</div>
         <div class="sheet-bar"><span>LIST ${esc(sh.vendor.name)}${f.area ? ' · ' + esc(f.area) : ''}</span><span>${dateTitle(V.date)}</span></div>
+        <div class="sheet-win no-print">${winChip(V.date)}${S.lateOrders(V.date).length ? ` <a href="#/hari-ini">${chip('warn', S.lateOrders(V.date).length + ' pesanan lewat belum dikira')}</a>` : ''}</div>
         ${!sh.menus.length ? empty('Vendor ini belum ada menu. Tambah di <a href="#/vendor-menu">Senarai Vendor → Vendor &amp; Menu</a>.')
           : !sh.rows.length ? empty('Tiada pesanan untuk vendor ini pada tarikh ini.')
           : `<div class="tbl-wrap"><table class="list">
@@ -231,16 +238,17 @@
         <td class="r">${i.qty}</td><td class="r">${u.rm(i.unitSen)}</td><td class="r">${u.rm(i.qty * i.unitSen)}</td></tr>`; }).join('')}
       <tr class="tot"><td colspan="2">Jumlah</td><td class="r">${S.orderQty(o)}</td><td></td><td class="r">${u.rm(S.orderSen(o))}</td></tr></tbody></table></div>`;
   }
-  const status = (o) => o.cancelled ? chip('gray', 'Dibatalkan') : S.needsReview(o) ? chip('warn', 'Perlu semakan') : chip('ok', 'OK');
+  const status = (o) => o.cancelled ? chip('gray', 'Dibatalkan') : S.isLate(o) ? chip('warn', 'Lewat') : S.needsReview(o) ? chip('warn', 'Perlu semakan')
+    : o.lateDecision === 'next' ? chip('gray', 'Lewat → ' + u.fmtDate(S.batchDate(o)).slice(0, 5)) : o.lateDecision === 'include' ? chip('ok', 'Lewat · dimasukkan') : chip('ok', 'OK');
   P.pesanan = {
     title: 'Pesanan',
     onRoute(p) { if (p.id) setTimeout(() => A.orderOpen({ id: p.id })); },
     render() {
       const f = ui.F('pesanan', { q: '', show: '' }), q = u.norm(f.q);
       const all = st().orders.filter((o) => o.date === V.date);
-      const counts = { review: all.filter(S.needsReview).length, cancelled: all.filter((o) => o.cancelled).length };
+      const counts = { review: all.filter(S.needsReview).length, late: all.filter((o) => !o.cancelled && S.outsideWindow(o)).length, cancelled: all.filter((o) => o.cancelled).length };
       const rows = all.filter((o) => (!q || u.norm(o.agentName + ' ' + S.agentLabel(o) + ' ' + o.sourceOrderId + ' ' + (o.agentPhone || '')).includes(q)) &&
-        (!f.show || (f.show === 'review' ? S.needsReview(o) : o.cancelled)))
+        (!f.show || (f.show === 'review' ? S.needsReview(o) : f.show === 'late' ? !o.cancelled && S.outsideWindow(o) : o.cancelled)))
         .sort((a, b) => (a.submittedAt < b.submittedAt ? 1 : -1));
       const summary = (o) => {
         const by = {};
@@ -250,7 +258,7 @@
       return `
       <div class="toolbar">
         <input id="p-q" type="search" class="search" placeholder="Cari ejen, No. HP atau no. pesanan…" value="${esc(f.q)}" data-f="pesanan.q">
-        <div class="seg" role="group" aria-label="Tapis">${[['', `Semua (${all.length})`], ['review', `Perlu semakan (${counts.review})`], ['cancelled', `Dibatalkan (${counts.cancelled})`]]
+        <div class="seg" role="group" aria-label="Tapis">${[['', `Semua (${all.length})`], ['review', `Perlu semakan (${counts.review})`], ['late', `Lewat (${counts.late})`], ['cancelled', `Dibatalkan (${counts.cancelled})`]]
           .map(([k, l]) => `<button class="${f.show === k ? 'on' : ''}" data-act="ordShow" data-k="${k}">${l}</button>`).join('')}</div>
       </div>
       <div class="card p0"><div class="tbl-wrap"><table class="tbl">
@@ -428,15 +436,37 @@
 
   // =============== TETAPAN ===============
   // Vendor & Menu and Ejen live under the "Senarai Vendor" group in the sidebar; Tetapan keeps system settings.
-  P['vendor-menu'] = { title: 'Vendor & Menu', render: () => tabMenu(ui.F('tetapan', { tab: 'bcl' })) };
-  P.ejen = { title: 'Ejen', render: () => tabEjen(ui.F('tetapan', { tab: 'bcl' })) };
-  const TABS = [['bcl', 'Sambungan BCL'], ['log', 'Log'], ['data', 'Data demo']];
+  P['vendor-menu'] = { title: 'Vendor & Menu', render: () => tabMenu(ui.F('tetapan', { tab: 'waktu' })) };
+  P.ejen = { title: 'Ejen', render: () => tabEjen(ui.F('tetapan', { tab: 'waktu' })) };
+  const TABS = [['waktu', 'Waktu pesanan'], ['bcl', 'Sambungan BCL'], ['log', 'Log'], ['data', 'Data demo']];
+  function tabWaktu() {
+    const w = S.win();
+    return `<section class="card narrow-card"><div class="card-head"><h3>Waktu pesanan harian</h3></div>
+      <p class="muted sm nomargin">Pesanan yang dibayar dalam waktu ini masuk senarai vendor hari itu. Selepas waktu tutup, senarai dikunci; pesanan lewat ditanda "Lewat" dan admin pilih sama ada masukkan hari ini atau pindah ke esok.</p>
+      <div class="form-grid mt">
+        <label class="field"><span>Borang dibuka</span><input type="time" value="${esc(w.open)}" data-act-change="setWindow" data-k="openTime"></label>
+        <label class="field"><span>Tutup & kunci senarai</span><input type="time" value="${esc(w.cutoff)}" data-act-change="setWindow" data-k="cutoffTime"></label>
+      </div>
+      <p class="muted xs">Waktu Malaysia. Buka/tutup borang BCL itu sendiri masih diurus di BCL.</p></section>`;
+  }
+  A.setWindow = (d, el) => {
+    const set = st().settings, v = el.value, other = d.k === 'openTime' ? set.cutoffTime || '15:00' : set.openTime || '10:00';
+    if (!/^\d{2}:\d{2}$/.test(v) || (d.k === 'openTime' ? v >= other : v <= other)) { el.value = set[d.k] || (d.k === 'openTime' ? '10:00' : '15:00'); return ui.toast('Waktu buka mesti sebelum waktu tutup.', 'err'); }
+    set[d.k] = v; S.log('Waktu pesanan diubah', `${d.k === 'openTime' ? 'Dibuka' : 'Tutup'} → ${u.fmtHM(v)}`); ui.commit(); ui.toast('Waktu pesanan disimpan.');
+  };
+  A.lateDecide = (d) => {
+    const o = st().orders.find((x) => x.id === d.id);
+    o.lateDecision = d.v; o.updatedAt = new Date().toISOString();
+    const msg = d.v === 'next' ? `dipindah ke senarai ${u.fmtDate(S.batchDate(o))}` : 'dimasukkan ke senarai hari ini';
+    o.revisions.push({ at: o.updatedAt, note: 'Pesanan lewat ' + msg + '.' });
+    S.log('Pesanan lewat', `${o.sourceOrderId} (${S.agentLabel(o)}) ${msg}`); ui.commit(); ui.toast(`${o.sourceOrderId} ${msg}.`);
+  };
   P.tetapan = {
     title: 'Tetapan',
     onRoute(p) { if (p.tab) ui.F('tetapan').tab = p.tab; },
     render() {
-      const f = ui.F('tetapan', { tab: 'bcl' });
-      const body = { bcl: tabBcl, log: tabLog, data: tabData }[f.tab] || tabBcl;
+      const f = ui.F('tetapan', { tab: 'waktu' });
+      const body = { waktu: tabWaktu, bcl: tabBcl, log: tabLog, data: tabData }[f.tab] || tabWaktu;
       return `<div class="tabs">${TABS.map(([k, l]) => `<button class="${f.tab === k ? 'on' : ''}" data-act="setTab" data-k="${k}">${l}</button>`).join('')}</div>${body(f)}`;
     },
   };

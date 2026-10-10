@@ -60,6 +60,8 @@
     return n ? `${n[1]}-${n[2]}-${n[3]}T${n[4]}:${n[5]}:${n[6] || '00'}+08:00` : s;
   }
   const toBclDate = (iso) => { const d = new Date(new Date(iso).getTime() + 8 * 3600e3).toISOString(); return `${d.slice(8, 10)}/${d.slice(5, 7)}/${d.slice(0, 4)} ${d.slice(11, 19)}`; };
+  const hmOf = (iso) => new Date(new Date(iso).getTime() + 8 * 3600e3).toISOString().slice(11, 16); // MYT "HH:MM"
+  function fmtHM(hm) { const [h, m] = hm.split(':').map(Number); return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'PG' : 'PTG'}`; }
   // ISO string with +08:00 offset for a business date + HH:MM
   const isoMY = (ymd, hm) => `${ymd}T${hm}:00+08:00`;
 
@@ -95,5 +97,5 @@
     download(name, '﻿' + html, 'application/vnd.ms-excel');
   }
 
-  NBK.u = { fromBclDate, toBclDate, phoneKey, dayName, esc, toSen, senToStr, rm, num, myDate, todayMY, addDays, fmtDate, fmtDT, isoMY, norm, uid, toCSV, downloadCSV, downloadXLS, download };
+  NBK.u = { hmOf, fmtHM, fromBclDate, toBclDate, phoneKey, dayName, esc, toSen, senToStr, rm, num, myDate, todayMY, addDays, fmtDate, fmtDT, isoMY, norm, uid, toCSV, downloadCSV, downloadXLS, download };
 })(globalThis.NBK = globalThis.NBK || {});

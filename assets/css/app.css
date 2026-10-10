@@ -284,6 +284,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--brand); outline:
 .row-input { display: flex; gap: 8px; } .row-input input { flex: 1; min-width: 0; font-size: 13px; }
 .wh-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line-2); }
 
+.sheet-win { display: flex; gap: 8px; flex-wrap: wrap; margin: -6px 0 14px; } .sheet-win a:hover { text-decoration: none; }
+.narrow-card { max-width: 640px; }
+
 /* ---------- modal / toast ---------- */
 #modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 16px; } #modal[hidden] { display: none; }
 .modal-back { position: absolute; inset: 0; background: rgba(15, 23, 42, .5); backdrop-filter: blur(3px); animation: fade .15s ease-out; }
